@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Earthquake Tracker</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="data:;base64,iVBORwOKGO=" />
+    <link rel="stylesheet" href="css/leaflet.css" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="settings-popup" class="popup">
+      <div class="popup-content">
+        <span class="close-btn" id="close-popup">&times;</span>
+        <h2>Settings</h2>
+        <p>Change the map background:</p>
+        <select class="filter-input" id="map-style-select">
+          <option value="Esri.WorldImagery">Esri Satellite</option>
+          <option value="OpenTopoMap">OpenTopoMap</option>
+          <option value="Thunderforest.Outdoors">Thunderforest Outdoors</option>
+          <!-- <option value="Stamen.Terrain">Stamen Terrain</option> -->
+        </select>
+      </div>
+    </div>
+
+    <div class="center_map_timeline">
+      <h2>Earthquake Tracker</h2>
+      <div id="map-container">
+        <div id="my-map"></div>
+      </div>
+      <br />
+      <br />
+      <div id="nonmap-container">
+        <div id="timeline-container"></div>
+        <div class="button-container">
+          <button id="prev-year" class="nav-button left">
+            <i class="fa fa-chevron-circle-left fa-2x"></i>
+          </button>
+          <span id="year-label" style="font-size: 20px; margin: 0 15px"
+            >2025</span
+          >
+          <button id="next-year" class="nav-button right">
+            <i class="fa fa-chevron-circle-right fa-2x"></i>
+          </button>
+          <br />
+          <br />
+          <button id="speed-back">
+            <i class="fa fa-backward fa-2x"></i>
+          </button>
+          <button id="play-pause-button">
+            <i class="fa fa-play fa-2x"></i>
+          </button>
+          <button id="stop-button">
+            <i class="fa fa-stop fa-2x"></i>
+          </button>
+          <button id="speed-up">
+            <i class="fa fa-forward fa-2x"></i>
+          </button>
+          <p><span class="animation_speed">100 ms</span> Interval</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/d3.v6.min.js"></script>
+    <script src="js/leaflet.js"></script>
+
+    <script type="module" src="js/main.js"></script>
+    <script src="js/leafletMap.js"></script>
+    <script src="js/timeline.js"></script>
+
+    <div id="tooltip"></div>
+
+    <div id="toggleDrawer" class="options_drawer_btn">
+      <i class="fa fa-chevron-circle-up fa-3x"></i>
+    </div>
+
+    <div id="drawer" class="drawer">
+      <div class="drawer-content">
+        <h2>Data Filters</h2>
+        <div id="side-filter-container">
+          <div id="color-legend-container">
+            Magnitude Color Legend
+            <div id="color-legend">
+              <div class="legend-item-container">
+                <div class="legend-item" data-min="0" data-max="3" style="background-color: blue;"></div>
+                <small class="legend-label">&lt;3</small>
+              </div>
+              <div class="legend-item-container">
+                <div class="legend-item" data-min="3" data-max="4" style="background-color: green;"></div>
+                <small class="legend-label">&lt;4</small>
+              </div>
+              <div class="legend-item-container">
+                <div class="legend-item" data-min="4" data-max="4.5" style="background-color: yellow;"></div>
+                <small class="legend-label">&lt;4.5</small>
+              </div>
+              <div class="legend-item-container">
+                <div class="legend-item" data-min="4.5" data-max="5" style="background-color: gold;"></div>
+                <small class="legend-label">&lt;5</small>
+              </div>
+              <div class="legend-item-container">
+                <div class="legend-item" data-min="5" data-max="5.5" style="background-color: orange;"></div>
+                <small class="legend-label">&lt;5.5</small>
+              </div>
+              <div class="legend-item-container">
+                <div class="legend-item" data-min="5.5" data-max="20" style="background-color: red;" ></div>
+                <small class="legend-label">  5.5+</small>
+              </div>
+            </div>
+            
+          </div>
+          <div class="filter-group">
+            <b>Depth</b>
+            <br />
+            <input type="checkbox" id="filter-depth" />
+            <label for="filter-depth">Enable</label>
+            <br />
+            <input
+              type="number"
+              class="filter-input"
+              id="min-depth"
+              placeholder="Min"
+            />
+            <input
+              type="number"
+              class="filter-input"
+              id="max-depth"
+              placeholder="Max"
+            />
+          </div>
+          <div class="filter-group">
+            <br />
+            <b>Magnitude</b>
+            <br />
+            <input type="checkbox" id="filter-magnitude" />
+            <label for="filter-magnitude">Enable</label>
+            <br />
+            <input
+              type="number"
+              class="filter-input"
+              id="min-magnitude"
+              placeholder="Min"
+            />
+            <input
+              type="number"
+              class="filter-input"
+              id="max-magnitude"
+              placeholder="Max"
+            />
+          </div>
+          <br />
+          <button class="btnm" id="apply-filter">Apply</button>
+          <button class="btnm" id="clear-filter">Clear</button>
+          <br /><br />
+          <div>
+            <a id="toggle-dragging" class="btnm">Enable Map Brush</a>
+          </div>
+        </div>
+      </div>
+      <div class="settings">
+        <a id="settings-btn" class="btn"><i class="fa fa-gear fa-1x"></i></a>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("settings-btn")
+        .addEventListener("click", function () {
+          document.getElementById("settings-popup").style.display = "block";
+        });
+
+      document
+        .getElementById("close-popup")
+        .addEventListener("click", function () {
+          document.getElementById("settings-popup").style.display = "none";
+        });
+
+      window.addEventListener("click", function (event) {
+        let popup = document.getElementById("settings-popup");
+        if (event.target === popup) {
+          popup.style.display = "none";
+        }
+      });
+
+      const toggleDrawerButton = document.getElementById("toggleDrawer");
+      const drawer = document.getElementById("drawer");
+
+      toggleDrawerButton.addEventListener("click", () => {
+        drawer.classList.toggle("open");
+
+        if (drawer.classList.contains("open")) {
+          toggleDrawerButton.innerHTML =
+            '<i class="fa fa-chevron-circle-down fa-3x"></i>';
+        } else {
+          toggleDrawerButton.innerHTML =
+            '<i class="fa fa-chevron-circle-up fa-3x"></i>';
+        }
+      });
+    </script>
+  </body>
+</html>
